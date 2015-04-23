@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<templates xmlns="http://podlove.org/validator/templates" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/"  >
     <template id="c-title">
         <message type="error" lang="en">title element is missing for 'rss/channel'</message>
         <template>
@@ -123,4 +122,17 @@
     <template id="i-itunes-author-length">
         <message type="error" lang="en">itunes:author length is missing for 'rss/channel/item'</message>
     </template>
-</rss>
+    <template id="i-itunes-image-width">
+        <message type="error" lang="en">the itunes:image width must be between 1400 to 2048 pixels</message>
+    </template>
+    <template id="i-itunes-image-height">
+        <message type="error" lang="en">the itunes:image height must be between 1400 to 2048 pixels</message>
+    </template>
+    <template id="i-itunes-image-width-and-height">
+        <message type="warnning" lang="en">itunes:image height and width should be the same</message>
+    </template>
+    <template id="i-itunes-image-jpg">
+        <message type="warnning" lang="en">itunes:image height and width should be the same</message>
+    </template>
+
+</templates>

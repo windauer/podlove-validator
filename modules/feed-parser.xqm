@@ -179,16 +179,16 @@ declare function fp:itunes-name($item as item()*){
 declare function fp:itunes-email($item as item()*){
     <info>element 'itunes-email' is fine</info>
 };
-declare function fp:itunes-image($item as item()*){
-    let $url := $item/@href
+declare function fp:itunes-image($image as item()*){
+    let $url := $image/@href
     let $analyzed-image := podlove:analyze(xs:anyURI($url))
     let $mime-type := data($analyzed-image/@mimeType)
     let $width := number(data($analyzed-image/@width))
     let $height := number(data($analyzed-image/@height))
-    let $error := ""
 
-    return 
-        <info>element 'itunes:image' is fine {$mime-type} {$width} {$height}</info>
+    let $errors :=
+            if($width lt 1400 or $width gt 2048) then ()
+
     
 };
 declare function fp:itunes-explicit($item as item()*){
@@ -214,40 +214,39 @@ declare function fp:ignore($item as item()*){
 };
 
 
-declare function fp:parse-rss($xml, $config){
+declare function fp:parse-rss($xml as item()*, $config){
  for $node in $xml
     let $fn-name := name($node)
     return
-         if ($node instance of element()) 
+        if ($node instance of document-node())
+            then (fp:parse-rss($node/*, $config))
+        else if ($node instance of element())
             then ( 
                 if(map:contains($config, $fn-name))
                 then (
                     $config($fn-name)($node),
                     fp:parse-rss($node/*, $config)
-                )else (
-                    (
-                        <error type="unknown element">{$fn-name}</error>,
-                        if(exists($node/*)) then (
-                            fp:parse-rss($node/*,$config)
-                        ) else ()
-                    )
-                )
+                )else ((
+                    <error type="unknown element">{$fn-name}</error>,
+                    if(exists($node/*)) then (
+                        fp:parse-rss($node/*,$config)
+                    ) else ()
+                ))
             )
-         else if ($node instance of attribute()) then 'attribute'
-         else if ($node instance of text()) then 'text'
-         else if ($node instance of document-node()) 
-            then (
-                fp:parse-rss($node/*, $config)
-            )
-         else if ($node instance of comment()) then 'comment'
-         else if ($node instance of processing-instruction())
-                 then 'processing-instruction'
-         else 'unknown'            
+         else
+            <error type="unknown element">{$fn-name}</error>
 };
 
 
 declare function fp:parse($feed as item()){
-    let $config := map:new (($fp:RSS-HANDLER,$fp:ATOM-HANDLER,$fp:ITUNES-HANDLER, $fp:DC-HANDLER, $fp:SY-HANDLER, $fp:XHTML-HANDLER, $fp:CONTENT-HANDLER))
+    let $config := map:new ((
+                          $fp:RSS-HANDLER,
+                          $fp:ATOM-HANDLER,
+                          $fp:ITUNES-HANDLER,
+                          $fp:DC-HANDLER,
+                          $fp:SY-HANDLER,
+                          $fp:XHTML-HANDLER,
+                          $fp:CONTENT-HANDLER))
    
     return 
         <result>
